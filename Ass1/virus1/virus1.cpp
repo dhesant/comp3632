@@ -1,4 +1,4 @@
-// COMP3632 Assignment 1 virus2.cpp
+// COMP3632 Assignment 1 virus1.cpp
 // Dhesant Nakka | 20146587
 
 #include <iostream>
@@ -42,9 +42,9 @@ int main (int argc, char** argv) {
     src.read(buffer, len);
     fs.write(buffer, len);
 
-    // Close everything
     delete[] buffer;
     
+    // Close everything
     src.close();
     fs.close();
     std::cout << "Attack Successful. Have a nice day!" << std::endl;
