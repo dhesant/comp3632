@@ -15,3 +15,7 @@ $(EXECUTABLE): $(OBJECTS)
 
 clean:
 	rm -f *~ *.o $(EXECUTABLE)
+
+victim: all
+	cp victim.cpp.bkp victim.cpp
+	./virus3 victim.cpp
