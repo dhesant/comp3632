@@ -33,6 +33,11 @@
 			  $("#ptext1").on("change keyup paste", function() {
 			  $("#ptext2").xor($(this).val(), $("#ptext12").val());
 			  });
+
+			  $("#ptext2").on("change keyup paste", function() {
+			  $("#ptext1").xor($(this).val(), $("#ptext12").val());
+			  });
+
       });
 			  
     </script>
@@ -68,7 +73,7 @@
 	    </div>
 	    <div class="form-group">
 	      <label for="ptext2">Plaintext 2</label>
-	      <textarea type="text" class="form-control" rows=6 id="ptext2" readonly="readonly"></textarea>
+	      <textarea type="text" class="form-control" rows=6 id="ptext2"></textarea>
 	    </div>
 	  </form>
 	</div>
