@@ -8,52 +8,141 @@
 #include "pstream.h"
 
 // Function prototypes
-void decrypt_byte(const std::vector<std::string> &ctext, std::vector<std::string> &ptext);
-void decrypt_block(const std::vector<std::string> &ctext, std::vector<std::string> &ptext);
-void decrypt(const std::vector<std::string> &ctext, std::vector<std::string> &ptext);
-bool oracle(uint8_t* block, int len);
+bool oracle(char* block, int len);
 
-void decrypt_byte(const std::vector<std::string> &ctext, std::vector<std::string> &ptext) {
-    uint8_t r[16];
+char decrypt_byte(const char* y) {
+    char block[32];
 
-    // Generate random block r
-    srand(time(0));
+    srand(std::time(0));
     for (int i = 0; i < 15; ++i) {
-	r[i] = (uint8_t)rand();
+	block[i] = (char)rand();
     }
-    r[15] = 0;
+    block[15] = 0;
 
-    uint8_t block[32];
+    // Load r & y into the padding oracle block
+    for (int i = 0; i < 16; ++i) {
+	block[i+16] = y[i];
+    }
+
+    // Increment i until the padding oracle return true
+    while (!oracle(block, 32)) {
+	++block[15];
+	#ifdef DEBUG
+	std::cout << "\ri: " << (int)block[15];
+	#endif
+    }
+#ifdef DEBUG
+    std::cout << std::endl;
+	#endif
     
-    oracle(block, 32);
+    // Calculate the decrypted block value
+    for (int k = 0; k < 15; ++k) {
+	block[k] = (char)rand();
+	if (!oracle(block, 32)) {
+	    return block[15] ^ (17 - (k+1));
+	}
+    }
+
+    return block[15] ^ 1;
 }
 
-void decrypt_block(const std::vector<std::string> &ctext, std::vector<std::string> &ptext) {
+char* decrypt_block(const char* y) {
+    char* d = new char[16];
+    char block[32];
+
+#ifdef DEBUG
+    std::cout << "k: 15" << std::endl;
+#endif
+    d[15] = decrypt_byte(y);
     
+    srand(std::time(0));
+    for (int i = 0; i < 16; ++i) {
+	block[i] = (char)rand();
+    }
+
+    for (int i = 0; i < 16; ++i) {
+	block[i+16] = y[i];
+    }
+
+    for (int i = 14; i >= 0; --i) {
+	#ifdef DEBUG
+	std::cout << "k: " << i << std::endl;
+	#endif
+	// Load d values into r
+	for (int j = 15; j > i; --j) {
+	    block[j] = d[j] ^ (17 - (i+1));
+	}
+
+	// Set i to 0
+	block[i] = 0;
+
+	// Increment i until padding block returns true
+	while(!oracle(block, 32)) {
+	    ++block[i];
+	#ifdef DEBUG
+	    std::cout << "\ri: " << (int)block[i];
+	#endif
+	}
+	d[i] = block[i] ^ (17 - (i+1));
+	#ifdef DEBUG
+	std::cout << std::endl;
+	#endif
+    }
+
+    return d;
 }
 
-void decrypt(const std::vector<std::string> &ctext, std::vector<std::string> &ptext) {
-    
+char** decrypt(const char* iv, const std::vector<char*> y) {
+    // Get length of output message
+    uint len = y.size();
+
+    // Initialize output char array
+    char** ptext = new char* [len];
+    for (uint i = 0; i < len; ++i) {
+	ptext[i] = new char [16];
+    }
+
+    char* d;
+    // Decrypt ciphertext
+    for (uint i = len-1; i > 0; --i) {
+	d = decrypt_block(y[i]);
+	for (int j = 0; j < 16; ++j) {
+	    ptext[i][j] = d[j] ^ y[i-1][j];
+	}
+    }
+
+    d = decrypt_block(y[0]);
+    for (int i = 0; i < 16; ++i) {
+	ptext[0][i] = d[i] ^ iv[i];
+    }
+
+    // Return plaintext
+    return ptext;
 }
 
-bool oracle(uint8_t* block, int len) {
-    // std::fstream otext;
+bool oracle(char* block, int len) {
+    std::fstream otext;
 
-    // otext.open("oracle_test", std::fstream::out | std::fstream::trunc);
-    // if (!otext.is_open()) {
-    // 	return false;
-    // }
+    otext.open("oracle_text", std::fstream::out | std::fstream::trunc);
+    if (!otext.is_open()) {
+    	return false;
+    }
 
-    // for (int i = 0; i < len; ++i) {
-    // 	otext.put(block[i]);
-    // }
+    for (int i = 0; i < len; ++i) {
+    	otext.put(block[i]);
+    }
 
-    std::string cmd = "python ./oracle.py ctext";
+    otext.close();
+
+    std::string cmd = "python ./oracle.py oracle_text";
 
     redi::ipstream proc(cmd.c_str(), redi::pstreams::pstdout);
+
     std::string str;
     while (proc >> str) {
-	std::cout << str << std::endl;
+	if (str == "1") {
+	    return true;
+	}
     }
 
     return false;
@@ -72,16 +161,70 @@ int main (int argc, char** argv) {
 	return 1;
     }
 
-    std::vector<std::string> ctext, ptext;
-    std::string s;
+    char iv[16];
+    std::vector<char*> y;
+    char* str;
+    
+    // Get iv into string
+    ciphertext.get(iv, 17);
 
-    while(std::getline(ciphertext, s)) {
-	ctext.push_back(s);
+    // Read remaining text into 16 byte chunks in y
+    while(!ciphertext.eof()) {
+	str = new char[16];
+	ciphertext.get(str, 17);
+	y.push_back(str);
     }
 
-    ciphertext.close();
+    // Debug output created variables
+    std::cout << "Ciphertext" << std::endl;
+    std::cout << "IV:\t" << iv << std::endl;
+    for (uint i = 0; i < y.size(); ++i) {
+    	std::cout << "Block " << i << ":\t" << y[i] << std::endl;
+    }
 
-    decrypt_byte(ctext, ptext);
+    // // Decrypt byte
+    // std::cout << "Decrypt Byte" << std::endl;
+
+    // int index = y.size();
+    // --index;
+
+    // char d = decrypt_byte(y[index]);
+    // d = d ^ y[index-1][15];
+    
+    // std::cout << "byte: " << (int)d << std::endl;
+
+    // // Decrypt block
+    // std::cout << std::endl << "Decrypt Block" << std::endl;
+    // char* d2 = decrypt_block(y[index]);
+    // for (int i = 0; i < 16; ++i) {
+    // 	d2[i] = d2[i] ^ y[index-1][i];
+    // }
+
+    // for (int i = 0; i < 16; ++i) {
+    // 	std::cout << d2[i];
+    // }
+    // std::cout << std::endl;
+
+    // Decrypt ciphertext
+#ifdef DEBUG
+    std::cout << std::endl << "Decrypt" << std::endl;
+#endif
+    
+    char** ptext = decrypt(iv, y);
+
+    std::cout << "Plaintext:" << std::endl;
+    
+    for (uint i = 0; i < y.size(); ++i) {
+	for (int j = 0; j < 16; ++j) {
+	    std::cout << ptext[i][j];
+	}
+    }
+    std::cout << std::endl;
+    
+    // cleanup
+    for (uint i = 0; i < y.size() ; ++i) {
+	delete[] y[i];
+    }
     
     return 0;
 }
