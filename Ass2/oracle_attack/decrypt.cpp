@@ -4,8 +4,9 @@
 #include <vector>
 #include <ctime>
 #include <cstdlib>
-//#include <iomanip>
 #include "pstream.h"
+
+//#define DEBUG
 
 // Function prototypes
 bool oracle(char* block, int len);
@@ -28,7 +29,7 @@ char decrypt_byte(const char* y) {
     while (!oracle(block, 32)) {
 	++block[15];
 	#ifdef DEBUG
-	std::cout << "\ri: " << (int)block[15];
+	std::cout << "\rk: 15; i: " << (int)block[15];
 	#endif
     }
 #ifdef DEBUG
@@ -50,9 +51,6 @@ char* decrypt_block(const char* y) {
     char* d = new char[16];
     char block[32];
 
-#ifdef DEBUG
-    std::cout << "k: 15" << std::endl;
-#endif
     d[15] = decrypt_byte(y);
     
     srand(std::time(0));
@@ -65,9 +63,6 @@ char* decrypt_block(const char* y) {
     }
 
     for (int i = 14; i >= 0; --i) {
-	#ifdef DEBUG
-	std::cout << "k: " << i << std::endl;
-	#endif
 	// Load d values into r
 	for (int j = 15; j > i; --j) {
 	    block[j] = d[j] ^ (17 - (i+1));
@@ -80,7 +75,7 @@ char* decrypt_block(const char* y) {
 	while(!oracle(block, 32)) {
 	    ++block[i];
 	#ifdef DEBUG
-	    std::cout << "\ri: " << (int)block[i];
+	    std::cout << "\rk: " << i << "; i: " << (int)block[i];
 	#endif
 	}
 	d[i] = block[i] ^ (17 - (i+1));
@@ -105,12 +100,18 @@ char** decrypt(const char* iv, const std::vector<char*> y) {
     char* d;
     // Decrypt ciphertext
     for (uint i = len-1; i > 0; --i) {
+#ifdef DEBUG
+	std::cout << "Block " << i << std::endl;
+#endif
 	d = decrypt_block(y[i]);
 	for (int j = 0; j < 16; ++j) {
 	    ptext[i][j] = d[j] ^ y[i-1][j];
 	}
     }
 
+#ifdef DEBUG
+    std::cout << "Block 0" << std::endl;
+#endif
     d = decrypt_block(y[0]);
     for (int i = 0; i < 16; ++i) {
 	ptext[0][i] = d[i] ^ iv[i];
@@ -175,12 +176,14 @@ int main (int argc, char** argv) {
 	y.push_back(str);
     }
 
+    #ifdef DEBUG
     // Debug output created variables
     std::cout << "Ciphertext" << std::endl;
     std::cout << "IV:\t" << iv << std::endl;
     for (uint i = 0; i < y.size(); ++i) {
     	std::cout << "Block " << i << ":\t" << y[i] << std::endl;
     }
+    #endif
 
     // // Decrypt byte
     // std::cout << "Decrypt Byte" << std::endl;
@@ -212,14 +215,13 @@ int main (int argc, char** argv) {
     
     char** ptext = decrypt(iv, y);
 
-    std::cout << "Plaintext:" << std::endl;
+    //std::cout << "Plaintext:" << std::endl;
     
     for (uint i = 0; i < y.size(); ++i) {
 	for (int j = 0; j < 16; ++j) {
 	    std::cout << ptext[i][j];
 	}
     }
-    std::cout << std::endl;
     
     // cleanup
     for (uint i = 0; i < y.size() ; ++i) {
