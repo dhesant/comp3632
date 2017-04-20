@@ -1,5 +1,5 @@
 # Sources for decrypt function
-D_SRCS=decrypt.cpp
+D_SRCS=decrypt.cpp decrypt_library.cpp
 
 # Sources for encrypt function
 E_SRCS=
