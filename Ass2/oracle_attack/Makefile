@@ -15,7 +15,13 @@ LDFLAGS=
 D_OBJS=$(D_SRCS:.cpp=.o)
 E_OBJS=$(E_SRCS:.cpp=.o)
 
-all: decrypt
+all: release
+
+debug: CFLAGS+=-g -DDEBUG
+debug: LDFLAGS+=-g
+debug: release
+
+release: decrypt
 
 decrypt: $(D_OBJS)
 	$(CC) $(LDFLAGS) $^ -o decrypt
