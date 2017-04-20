@@ -1,8 +1,8 @@
 # Sources for decrypt function
-D_SRCS=decrypt.cpp decrypt_library.cpp
+D_SRCS = decrypt.cpp decrypt_library.cpp
 
 # Sources for encrypt function
-E_SRCS=
+E_SRCS = encrypt.cpp decrypt_library.cpp
 
 ##################################################
 # DO NOT TOUCH BELOW THIS (Makefile Magic)
@@ -21,7 +21,7 @@ debug: CFLAGS+=-g -DDEBUG
 debug: LDFLAGS+=-g
 debug: release
 
-release: decrypt
+release: decrypt encrypt
 
 decrypt: $(D_OBJS)
 	$(CC) $(LDFLAGS) $^ -o decrypt
