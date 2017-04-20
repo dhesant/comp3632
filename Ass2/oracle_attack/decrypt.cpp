@@ -135,7 +135,7 @@ bool oracle(char* block, int len) {
 
     otext.close();
 
-    std::string cmd = "python ./oracle.py oracle_text";
+    std::string cmd = "python ./oracle oracle_text";
 
     redi::ipstream proc(cmd.c_str(), redi::pstreams::pstdout);
 
