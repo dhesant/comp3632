@@ -27,6 +27,9 @@ char decrypt_byte(const char* y) {
     // Increment i until the padding oracle return true
     while (!oracle(block, 32)) {
 	++block[15];
+	if (block[15] == 0) {
+	    return 0;
+	}
 	#ifdef DEBUG
 	std::cout << "\rk: 15; i: " << (int)block[15];
 	#endif
@@ -73,6 +76,9 @@ char* decrypt_block(const char* y) {
 	// Increment i until padding block returns true
 	while(!oracle(block, 32)) {
 	    ++block[i];
+	    if (block[i] == 0) {
+		return 0;
+	    }
 	#ifdef DEBUG
 	    std::cout << "\rk: " << i << "; i: " << (int)block[i];
 	#endif

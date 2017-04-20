@@ -55,6 +55,9 @@ int main (int argc, char** argv) {
 	for (int j = 0; j < 16; ++j) {
 	    str[j] = d[j] ^ x[i][j];
 	}
+
+	delete[] d;
+	
 	y.insert(y.begin(), str);
     }
     
