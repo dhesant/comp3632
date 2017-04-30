@@ -1,8 +1,6 @@
 #include <iostream>
-#include <fstream>
 #include <vector>
-#include <string>
-#include <algorithm>
+
 #include "functions.h"
 
 int main(int argc, char** argv) {
@@ -29,16 +27,6 @@ int main(int argc, char** argv) {
     int change = calc_change(d1, d2);
     
     std::cout << std::endl << "Change metric: " << change << std::endl;
-
-    
-    std::cout << std::endl << "Sorting Test" << std::endl;
-
-    std::sort(d1.begin(), d1.end(), sort_age);
-
-    std::cout << "Datafile 1" << std::endl;
-    for (uint i = 0; i < d1.size(); ++i) {
-	std::cout << d1[i].pos << ":\tAge: " << d1[i].age << ", Phage: " << d1[i].phage << std::endl;
-    }
 
     return 0;
 }
