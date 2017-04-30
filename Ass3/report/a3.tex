@@ -4,6 +4,7 @@
 \usepackage[margin=1in]{geometry}
 \usepackage {mathtools}
 \usepackage {amssymb}
+\usepackage {tabulary}
 
 % Fix URLs
 \usepackage{url}
@@ -19,9 +20,37 @@
 \maketitle
 
 \section{Question 1}
+\begin{tabulary}{\textwidth}{C|C|C|C|C|C}
+  \hline
+  \textbf{Name} & \textbf{\# Data holders} & \textbf{Comp. cost} & \textbf{Distortion} & \textbf{Leakage} & \textbf{Private queries} \\
+  \hline
+  k-anonymity & 1 & Low & Yes & Yes & No \\
+  \hline
+  Private Information Retrieval & 1+ & High & No & Yes & Yes \\
+  \hline
+  Secure Multiparty Computation & 2+ & High & No & No & No \\
+  \hline
+  Differential Privacy & 1+ & Low & Yes & No & No \\
+  \hline
+\end{tabulary}
 
 \section{Question 2}
+\subsection{Part a}
+Losing Wednesday's backup would cause the most data to be lost, as Monday's, Tuesday's, and Wednesday's backups only rely on the previous Sunday's backups to be restored, and therefore, the loss of Monday's and Tuesday's backups do not affect the ability to restore Wednesday's backups and vice versa. However, Thursday's, Friday's and Saturday's backup rely on the previous day's backup to be intact in order for it to be restored, therefore, losing Wednesday's backup would render Thursday's, Friday's, and Saturday's backup useless, as well as Wednesday's, losing 4 days of data.
+
+\subsection{Part b}
+One technique would be to switch the incremental backups to differential backups, thus eliminating the problem described above. However, this would require more storage and have more overhead, as the differential backup from Saturday will contain all the same information as the differential backup from Friday, in addition to the extra data generated on Saturday, resulting in wasted storage, as the data from Friday is stored twice. Similiary, the data from Monday would be stored in each differential backup in that week, and would therefore would have 5 duplicate copies.
+
+\subsection{Part c}
+Alternating between incremental and differential backups is a way to minimize the worst case data loss, i.e. every Monday, Wednesday and Friday, a differential backup is performed; and every Tuesday, Thursday, and Saturday, an incremental backup is performed. This scheme ensures that at most, only two days of data can be lost at any one time, as the loss of any differential backup will only affect itself and the following incremental backup, while the loss of any incremental backup will only affect itself.
+
+\subsection{Part d}
+A backup can contain an encrypted version of a file because it can be decrypted with the appropriate keys after restoration, provided they still exist. However, hashes cannot be backups because they are a one-way function, and the original data cannot be recovered with only the hashes, even if the hashing algorithm and initialization parameters are known.
 
 \section{Question 3}
+\paragraph{Business Impact Analysis}
+\paragraph{Solutions}
+\paragraph{Disaster Recovery Plan}
+\paragraph{Ongoing Plan Implementation and Maintenance}
 
 \end{document}
