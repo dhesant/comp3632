@@ -32,6 +32,28 @@ int mean_age(const std::vector<entry_t> &d, int start, int len) {
     return sum_age(d, start, len) / len;
 }
 
+int opt_age(const std::vector<entry_t> &d, int start, int len) {
+    int val = d[start].age - 1;
+
+    int prev = 0;
+    int curr = 0x7FFFFFFF;
+
+    do {
+	++val;
+	prev = curr;
+	curr = 0;
+
+	for (int i = start; i < start+len; ++i) {
+	    curr += abs(d[i].age - val);
+	}
+
+	std::cout << val << "\t" << prev << "\t" << curr << std::endl;
+
+    } while (prev > curr);
+
+    return val-1;
+}
+
 void parse_csv(const char* filename, std::vector<entry_t> &d) {
     std::fstream df;
 

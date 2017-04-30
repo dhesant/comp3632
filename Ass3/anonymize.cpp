@@ -83,7 +83,7 @@ int main(int argc, char** argv) {
 
 	// Get data values for anonyminity dataset
 	for (uint i = 0; i < bins; ++i) {
-	    data.push_back(mean_age(d, index[i], lens[i]));
+	    data.push_back(opt_age(d, index[i], lens[i]));
 	}
 
 	// Update dataset
