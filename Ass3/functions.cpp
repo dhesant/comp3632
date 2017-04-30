@@ -18,12 +18,14 @@ void parse_csv(const char* filename, std::vector<entry_t> &d) {
     std::string s;
     std::size_t pos;
     entry_t entry;
-
+    entry.pos = 0;
+    
     while(getline(df,s)) {
 	pos = s.find(',');
 	entry.age = std::stoi(s.substr(0,pos));
 	entry.phage = std::stoi(s.substr(pos+1));
 	d.push_back(entry);
+	++entry.pos;
     }
 }
 

@@ -17,12 +17,12 @@ int main(int argc, char** argv) {
 
     std::cout << "Datafile 1" << std::endl;
     for (uint i = 0; i < d1.size(); ++i) {
-	std::cout << "Age: " << d1[i].age << ", Phage: " << d1[i].phage << std::endl;
+	std::cout << d1[i].pos << ":\tAge: " << d1[i].age << ", Phage: " << d1[i].phage << std::endl;
     }
 
     std::cout << std::endl << "Datafile 2" << std::endl;
     for (uint i = 0; i < d2.size(); ++i) {
-	std::cout << "Age: " << d2[i].age << ", Phage: " << d1[i].phage << std::endl;
+	std::cout << d2[i].pos << ":\tAge: " << d2[i].age << ", Phage: " << d1[i].phage << std::endl;
     }
 
     int change = calc_change(d1, d2);

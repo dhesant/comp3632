@@ -4,6 +4,7 @@
 struct entry_t {
     int age;
     bool phage;
+    int pos;
 };
 
 void parse_csv(const char* filename, std::vector<entry_t> &d);
