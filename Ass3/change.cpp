@@ -2,12 +2,7 @@
 #include <fstream>
 #include <vector>
 #include <string>
-#include <cstdlib>
-
-struct entry_t {
-    int age;
-    bool phage;
-} entry;
+#include "functions.h"
 
 int main(int argc, char** argv) {
     if (argc < 3) {
@@ -15,38 +10,10 @@ int main(int argc, char** argv) {
 	return 1;
     }
 
-    std::fstream df1, df2;
-
-    df1.open(argv[1], std::fstream::in);
-
-    if (!df1.is_open()) {
-	std::cout << "Unable to open file " << argv[1] << std::endl;
-	return 1;
-    }
-
-    df2.open(argv[2], std::fstream::in);
-    if (!df2.is_open()) {
-	std::cout << "Unable to open file " << argv[2] << std::endl;
-	return 1;
-    }
-
     std::vector<entry_t> d1, d2;
-    std::string s;
-    std::size_t pos;
 
-    while(getline(df1,s)) {
-	pos = s.find(',');
-	entry.age = std::stoi(s.substr(0,pos));
-	entry.phage = std::stoi(s.substr(pos+1));
-	d1.push_back(entry);
-    }
-
-    while(getline(df2,s)) {
-	pos = s.find(',');
-	entry.age = std::stoi(s.substr(0,pos));
-	entry.phage = std::stoi(s.substr(pos+1));
-	d2.push_back(entry);
-    }
+    parse_csv(argv[1], d1);
+    parse_csv(argv[2], d2);
 
     std::cout << "Datafile 1" << std::endl;
     for (uint i = 0; i < d1.size(); ++i) {
@@ -58,17 +25,8 @@ int main(int argc, char** argv) {
 	std::cout << "Age: " << d2[i].age << ", Phage: " << d1[i].phage << std::endl;
     }
 
-    if (d1.size() != d2.size()) {
-	std::cout << "File lengths are unequal. Exiting..." << std::endl;
-	return 1;
-    }
-
-    int change = 0;
+    int change = calc_change(d1, d2);
     
-    for (uint i = 0; i < d1.size(); ++i) {
-	change += abs(d2[i].age - d1[i].age);
-    }
-
     std::cout << std::endl << "Change metric: " << change << std::endl;
 
     return 0;

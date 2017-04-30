@@ -1,5 +1,5 @@
 # Sources for decrypt function
-C_SRCS = change.cpp
+C_SRCS = change.cpp functions.cpp
 
 # Sources for encrypt function
 A_SRCS = 
