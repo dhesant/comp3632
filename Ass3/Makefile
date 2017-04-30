@@ -2,7 +2,8 @@
 C_SRCS = change.cpp functions.cpp
 
 # Sources for encrypt function
-A_SRCS = 
+A_SRCS = anonymize.cpp functions.cpp
+
 
 ##################################################
 # DO NOT TOUCH BELOW THIS (Makefile Magic)
@@ -21,7 +22,7 @@ debug: CFLAGS+=-g -DDEBUG
 debug: LDFLAGS+=-g
 debug: release
 
-release: change
+release: change anonymize
 
 change: $(C_OBJS)
 	$(CC) $(LDFLAGS) $^ -o change

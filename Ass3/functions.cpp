@@ -40,6 +40,25 @@ void parse_csv(const char* filename, std::vector<entry_t> &d) {
 	d.push_back(entry);
 	++entry.pos;
     }
+
+    return;
+}
+
+void write_csv(const char* filename, const std::vector<entry_t> &d) {
+    std::fstream df;
+
+    df.open(filename, std::fstream::out | std::fstream::trunc);
+
+    if (!df.is_open()) {
+	std::cout << "Unable to open file " << filename << std::endl;
+	return;
+    }
+
+    for (uint i = 0; i < d.size(); ++i) {
+	df << d[i].age << "," << d[i].phage << std::endl;
+    }
+
+    return;
 }
 
 int calc_change (const std::vector<entry_t> d1, const std::vector<entry_t> d2) {
@@ -56,3 +75,4 @@ int calc_change (const std::vector<entry_t> d1, const std::vector<entry_t> d2) {
 
     return change;
 }
+
