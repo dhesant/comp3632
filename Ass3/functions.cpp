@@ -49,7 +49,7 @@ int opt_age(const std::vector<entry_t> &d, int start, int len) {
 
 	std::cout << val << "\t" << prev << "\t" << curr << std::endl;
 
-    } while (prev > curr);
+    } while (prev > curr && val < d[start+len-1].age);
 
     return val-1;
 }
