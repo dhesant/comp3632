@@ -69,11 +69,13 @@ int main(int argc, char** argv) {
 	}
 
 	// DEBUG: print length distribution
+	#ifdef DEBUG
 	std::cout << "Current split: ";
 	for (uint i = 0; i < bins; ++i) {
 	    std::cout << lens[i] << ", ";
 	}
 	std::cout << std::endl;
+	#endif
 
 	// Calculate offset index
 	index.push_back(0);
@@ -98,7 +100,7 @@ int main(int argc, char** argv) {
 	std::cout << "Current metric: " << current << std::endl;
 
 	if (current < metric) {
-	    std::cout << "Current index better than previous. Writing to output..." << std::endl;
+	    std::cout << "Current metric better than previous. Writing to output..." << std::endl;
 	    metric = current;
 	    std::sort(d2.begin(), d2.end(), sort_pos);
 	    write_csv(argv[2], d2);
