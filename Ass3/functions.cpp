@@ -2,8 +2,21 @@
 #include <fstream>
 #include <vector>
 #include <string>
-#include <cstdlib>
 #include "functions.h"
+
+bool sort_age(entry_t e1, entry_t e2) {
+    return (e1.age < e2.age);
+}
+
+bool sort_pos(entry_t e1, entry_t e2) {
+    return (e1.pos < e2.pos);
+}
+
+int abs(int a) {
+    if (a < 0)
+	return -a;
+    return a;
+}
 
 void parse_csv(const char* filename, std::vector<entry_t> &d) {
     std::fstream df;
