@@ -18,6 +18,20 @@ int abs(int a) {
     return a;
 }
 
+int sum_age(const std::vector<entry_t> &d, int start, int len) {
+    int sum = 0;
+
+    for (int i = start; i < start+len; ++i) {
+	sum += d[i].age;
+    }
+
+    return sum;
+}
+
+int mean_age(const std::vector<entry_t> &d, int start, int len) {
+    return sum_age(d, start, len) / len;
+}
+
 void parse_csv(const char* filename, std::vector<entry_t> &d) {
     std::fstream df;
 
