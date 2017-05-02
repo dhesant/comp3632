@@ -32,26 +32,46 @@ int mean_age(const std::vector<entry_t> &d, int start, int len) {
     return sum_age(d, start, len) / len;
 }
 
+int delta_age(const std::vector<entry_t> &d, int start, int len, int val) {
+    int sum = 0;
+
+    for (int i = start; i < start+len; ++i) {
+	sum += abs(d[i].age - val);
+    }
+
+    return sum;
+}
+
 int opt_age(const std::vector<entry_t> &d, int start, int len) {
-    int prev = 0;
-    int curr = 0x7FFFFFFF;
+    int val = mean_age(d, start, len);
 
-    for (int val = d[start].age; val < d[start+len-1].age; ++val) {
-	prev = curr;
-	curr = 0;
-	
-	for (int i = start; i < start+len; ++i) {
-	    curr += abs(d[i].age - val);
-	}
+    int prev = delta_age(d, start, len, val);
+    int curr = delta_age(d, start, len, ++val);
 
-	#ifdef DEBUG
+    bool grad = false;
+
+    if (prev > curr) {
+	grad = true;
+    }
+
+    while (val >= d[start].age && val <= d[start+len-1].age) {
+        #ifdef DEBUG
 	std::cout << val << "\t" << prev << "\t" << curr << std::endl;
 	#endif
 
-	if (prev <= curr) {
-	    return val-1;
+	prev = curr;
+
+	if (grad) {
+	    curr = delta_age(d, start, len, ++val);
+	    if (prev >= curr)
+		return --val;
 	}
 
+	else {
+	    curr = delta_age(d, start, len, --val);
+	    if (prev <= curr)
+		return ++val;
+	}
     }
 
     return mean_age(d, start, len);
