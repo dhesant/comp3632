@@ -1,8 +1,6 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
-#include <random>
-#include <numeric>
 
 #include "functions.h"
 
@@ -27,7 +25,13 @@ int main(int argc, char** argv) {
     }
     #endif
 
-    // Sort datafile by age and print to cout
+    // Ensure enough inputs for 5-anonymity
+    if (d.size() < BIN_SIZE) {
+	std::cout << "Not enough data points" << std::endl;
+	return 1;
+    }
+    
+    // Sort datafile by age
     std::sort(d.begin(), d.end(), sort_age);
 
     // DEBUG: Print sorted datafile to cout
@@ -38,12 +42,7 @@ int main(int argc, char** argv) {
     }
     #endif
 
-    if (d.size() < BIN_SIZE) {
-	std::cout << "Not enough data points" << std::endl;
-	return 1;
-    }
-    
-    // Calculate number of bins for k
+    // Calculate number of bins
     uint max_bins = d.size() / BIN_SIZE;
 
     #ifdef DEBUG
@@ -52,19 +51,18 @@ int main(int argc, char** argv) {
 
     // Setup storage table
     std::vector<std::vector<metric_t>> metric;
-
     metric.resize(max_bins);
     for (uint i = 0; i < metric.size(); ++i) {
 	metric[i].resize(d.size());
     }
 
-    // Calculate first col of table
+    // Calculate first col of the table
     for (uint i = 0; i < d.size(); ++i) {
 	metric[0][i].metric = opt_metric(d, 0, i+1);
 	metric[0][i].bins.push_back(i+1);
     }
 
-    // Calculate second col of table
+    // Calculate rest of the cols of the table
     for (uint n = 1; n < max_bins; ++n) {
 	for (uint i = 0; i < d.size(); ++i) {
 	    std::vector<metric_t> v;
@@ -79,8 +77,8 @@ int main(int argc, char** argv) {
 		}
 	    
 		int delta = opt_metric(d, k+1, j);
-		//std::cout << n << "," << i << ": " << k << "," << j << ": " << delta << std::endl;
-		
+
+		// If valid metric, push to vector
 		if (delta >= 0) {
 		    m.metric += delta;
 		    m.bins.push_back(j);
@@ -88,12 +86,15 @@ int main(int argc, char** argv) {
 		}
 	    }
 
+	    // Sort vector by metric
 	    std::sort(v.begin(), v.end(), metric_sort);
-	
+
+	    // Ensure vector is not empty
 	    if(v.empty()) {
 		v.push_back(metric[n-1][i]);
 	    }
 
+	    // DEBUG: Print metric info to cout
 	    #ifdef DEBUG
 	    for (uint k = 0; k < v.size(); ++k) {
 		std::cout << i+1 << ": " << k << ": ";
@@ -102,6 +103,7 @@ int main(int argc, char** argv) {
 	    std::cout << std::endl;
 	    #endif
 
+	    // Push best metric to calc table
 	    metric[n][i] = v[0];
 	}
     }
@@ -121,6 +123,7 @@ int main(int argc, char** argv) {
 	std::cout << std::endl;
     }
 
+    // Create vectors for data write
     std::vector<entry_t> d2 = d;
     std::vector<uint> bins = metric[metric.size()-1][d.size()-1].bins;
     std::vector<uint> index, data;
@@ -143,10 +146,11 @@ int main(int argc, char** argv) {
 	}
     }
 
-    // Check if current metric is better
+    // Write metric to cout
     int current = calc_change(d, d2);
     std::cout << "Current metric: " << current << std::endl;
 
+    // Write metric to output file
     std::sort(d2.begin(), d2.end(), sort_pos);
     write_csv(argv[2], d2);
     
