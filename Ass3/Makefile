@@ -10,7 +10,7 @@ A_SRCS = anonymize.cpp functions.cpp
 ##################################################
 
 CC=g++
-CFLAGS=-Wall -std=c++11
+CFLAGS=-Wall -std=c++11 -O3
 LDFLAGS=
 
 C_OBJS=$(C_SRCS:.cpp=.o)
