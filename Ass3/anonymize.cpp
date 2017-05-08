@@ -11,7 +11,7 @@
 int main(int argc, char** argv) {
     // Ensure valid input arguments
     if (argc < 3) {
-	std::cout << "Usage: change <input file 1> <input file 2>" << std::endl;
+	std::cout << "Usage: anonymize <input file> <output file>" << std::endl;
 	return 1;
     }
 
