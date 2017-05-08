@@ -9,7 +9,7 @@ struct entry_t {
 
 struct metric_t {
     int metric;
-    std::vector<int> bins;
+    std::vector<uint> bins;
 };
 
 bool sort_age(entry_t e1, entry_t e2);

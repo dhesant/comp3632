@@ -79,7 +79,7 @@ int main(int argc, char** argv) {
 		}
 	    
 		int delta = opt_metric(d, k+1, j);
-		std::cout << n << "," << i << ": " << k << "," << j << ": " << delta << std::endl;
+		//std::cout << n << "," << i << ": " << k << "," << j << ": " << delta << std::endl;
 		
 		if (delta >= 0) {
 		    m.metric += delta;
@@ -94,11 +94,13 @@ int main(int argc, char** argv) {
 		v.push_back(metric[n-1][i]);
 	    }
 
+	    #ifdef DEBUG
 	    for (uint k = 0; k < v.size(); ++k) {
 		std::cout << i+1 << ": " << k << ": ";
 		print_metric(v[k]);
 	    }
 	    std::cout << std::endl;
+	    #endif
 
 	    metric[n][i] = v[0];
 	}
@@ -118,6 +120,35 @@ int main(int argc, char** argv) {
 	}
 	std::cout << std::endl;
     }
+
+    std::vector<entry_t> d2 = d;
+    std::vector<uint> bins = metric[metric.size()-1][d.size()-1].bins;
+    std::vector<uint> index, data;
+	
+    // Calculate offset index
+    index.push_back(0);
+    for (uint i = 0; i < bins.size(); ++i) {
+	index.push_back(index[i] + bins[i]);
+    }
+
+    // Get data values for anonyminity dataset
+    for (uint i = 0; i < bins.size(); ++i) {
+	data.push_back(opt_age(d, index[i], bins[i]));
+    }
+
+    // Update dataset
+    for (uint j = 0; j < bins.size(); ++j) {
+	for (uint i = index[j]; i < index[j+1]; ++i) {
+	    d2[i].age = data[j];
+	}
+    }
+
+    // Check if current metric is better
+    int current = calc_change(d, d2);
+    std::cout << "Current metric: " << current << std::endl;
+
+    std::sort(d2.begin(), d2.end(), sort_pos);
+    write_csv(argv[2], d2);
     
     return 0;
 }
