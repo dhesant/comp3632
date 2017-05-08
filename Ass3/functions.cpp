@@ -43,6 +43,11 @@ int delta_age(const std::vector<entry_t> &d, int start, int len, int val) {
 }
 
 int opt_age(const std::vector<entry_t> &d, int start, int len) {
+    // Safety checks
+    if (len <= 0) {
+	return 0;
+    }
+    
     int val = mean_age(d, start, len);
 
     int prev = delta_age(d, start, len, val);
@@ -75,6 +80,21 @@ int opt_age(const std::vector<entry_t> &d, int start, int len) {
     }
 
     return mean_age(d, start, len);
+}
+
+int opt_metric(const std::vector<entry_t> &d, int start, int len) {
+    // Safety checks
+    if (len == 0) {
+	return 0;
+    }
+    
+    if (len < 5) {
+	return -1;
+    }
+
+    int val = opt_age(d, start, len);
+
+    return delta_age(d, start, len, val);
 }
 
 void parse_csv(const char* filename, std::vector<entry_t> &d) {
@@ -135,3 +155,14 @@ int calc_change (const std::vector<entry_t> d1, const std::vector<entry_t> d2) {
     return change;
 }
 
+void print_metric(const metric_t &m) {
+    std::cout << m.metric << "\t";
+    for (uint i = 0; i < m.bins.size(); ++i) {
+	std::cout << m.bins[i] << ", ";
+    }
+    std::cout << std::endl;
+}
+
+bool metric_sort(metric_t m1, metric_t m2) {
+    return (m1.metric < m2.metric);
+}
