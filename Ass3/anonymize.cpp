@@ -40,7 +40,12 @@ int main(int argc, char** argv) {
 
     // Calculate number of bins for k
     uint len = d.size();
+
     uint bins = len / BIN_SIZE;
+    
+    if (!(len % BIN_SIZE)) {
+	--bins;
+    }
 
     #ifdef DEBUG
     std::cout << "No of bins: " << bins << std::endl << std::endl;
@@ -53,7 +58,7 @@ int main(int argc, char** argv) {
     std::mt19937 e(rd());
     std::uniform_int_distribution<> rnd(0,bins);
 
-    for (int t = 0; t < 50; ++t) {
+    for (;;) {
 	// Setup temp vars
 	std::vector<entry_t> d2 = d;
 	std::vector<uint> lens, index, data;
