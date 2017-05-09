@@ -8,8 +8,8 @@
 
 int main(int argc, char** argv) {
     // Ensure valid input arguments
-    if (argc < 3) {
-	std::cout << "Usage: anonymize <input file> <output file>" << std::endl;
+    if (argc < 2) {
+	std::cout << "Usage: anonymize <target file>" << std::endl;
 	return 1;
     }
 
@@ -152,7 +152,7 @@ int main(int argc, char** argv) {
 
     // Write metric to output file
     std::sort(d2.begin(), d2.end(), sort_pos);
-    write_csv(argv[2], d2);
+    write_csv(argv[1], d2);
     
     return 0;
 }
