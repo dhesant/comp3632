@@ -13,6 +13,10 @@ int abs(int a) {
     return a;
 }
 
+bool sort_index(entry_t e1, entry_t e2) {
+    return (e1.index < e2.index);
+}
+
 // int sum_age(const std::vector<entry_t> &d, int start, int len) {
 //     int sum = 0;
 
