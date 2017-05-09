@@ -120,6 +120,8 @@ void parse_csv(const char* filename, std::vector<entry_t> &d) {
 	++entry.pos;
     }
 
+    df.close();
+    
     return;
 }
 
@@ -136,6 +138,8 @@ void write_csv(const char* filename, const std::vector<entry_t> &d) {
     for (uint i = 0; i < d.size(); ++i) {
 	df << d[i].age << "," << d[i].phage << std::endl;
     }
+
+    df.close();
 
     return;
 }
