@@ -20,26 +20,28 @@
 \maketitle
 
 \section{Question 1}
-\begin{tabulary}{\textwidth}{C|C|C|C|C|C}
-  \hline
-  \textbf{Name} & \textbf{\# Data holders} & \textbf{Comp. cost} & \textbf{Distortion} & \textbf{Leakage} & \textbf{Private queries} \\
-  \hline
-  k-anonymity & 1 & Low & Yes & Yes & No \\
-  \hline
-  Private Information Retrieval & 1+ & High & No & Yes & Yes \\
-  \hline
-  Secure Multiparty Computation & 2+ & High & No & No & No \\
-  \hline
-  Differential Privacy & 1+ & Low & Yes & No & No \\
-  \hline
-\end{tabulary}
+\begin{table}[H]
+  \begin{tabulary}{\textwidth}{L|C|C|C|C|C}
+    \hline
+    \textbf{Name} & \textbf{\# Data holders} & \textbf{Comp. cost} & \textbf{Distortion} & \textbf{Leakage} & \textbf{Private queries} \\
+    \hline
+    k-anonymity & 1 & Low & Yes & Yes & No \\
+    \hline
+    Private Information Retrieval & 1+ & High & No & Yes & Yes \\
+    \hline
+    Secure Multiparty Computation & 2+ & High & No & No & No \\
+    \hline
+    Differential Privacy & 1+ & Low & Yes & No & No \\
+    \hline
+  \end{tabulary}
+\end{table}
 
 \section{Question 2}
 \subsection{Part a}
 Losing Wednesday's backup would cause the most data to be lost, as Monday's, Tuesday's, and Wednesday's backups only rely on the previous Sunday's backups to be restored, and therefore, the loss of Monday's and Tuesday's backups do not affect the ability to restore Wednesday's backups and vice versa. However, Thursday's, Friday's and Saturday's backup rely on the previous day's backup to be intact in order for it to be restored, therefore, losing Wednesday's backup would render Thursday's, Friday's, and Saturday's backup useless, as well as Wednesday's, losing 4 days of data.
 
 \subsection{Part b}
-One technique would be to switch the incremental backups to differential backups, thus eliminating the problem described above. However, this would require more storage and have more overhead, as the differential backup from Saturday will contain all the same information as the differential backup from Friday, in addition to the extra data generated on Saturday, resulting in wasted storage, as the data from Friday is stored twice. Similiary, the data from Monday would be stored in each differential backup in that week, and would therefore would have 5 duplicate copies.
+One technique would be to switch the incremental backups to differential backups, thus eliminating the problem described above. However, this would require more storage and have more overhead, as the differential backup from Saturday will contain all the same information as the differential backup from Friday, in addition to the extra data generated on Saturday, resulting in wasted storage, as the data from Friday is stored twice. Similarly, the data from Monday would be stored in each differential backup in that week, and would therefore would have 5 duplicate copies.
 
 \subsection{Part c}
 Alternating between incremental and differential backups is a way to minimize the worst case data loss, i.e. every Monday, Wednesday and Friday, a differential backup is performed; and every Tuesday, Thursday, and Saturday, an incremental backup is performed. This scheme ensures that at most, only two days of data can be lost at any one time, as the loss of any differential backup will only affect itself and the following incremental backup, while the loss of any incremental backup will only affect itself.
@@ -47,10 +49,71 @@ Alternating between incremental and differential backups is a way to minimize th
 \subsection{Part d}
 A backup can contain an encrypted version of a file because it can be decrypted with the appropriate keys after restoration, provided they still exist. However, hashes cannot be backups because they are a one-way function, and the original data cannot be recovered with only the hashes, even if the hashing algorithm and initialization parameters are known.
 
-\section{Question 3}
-\paragraph{Business Impact Analysis}
-\paragraph{Solutions}
-\paragraph{Disaster Recovery Plan}
-\paragraph{Ongoing Plan Implementation and Maintenance}
+\section{Question 3: Business Continuity Plan}
+\subsection{Business Impact Analysis}
+A critical service for the business would be the website for the company. This is because it provides the most visible interface between the company and its clients, and is highly prominent in the public eye. Therefore, it is imperative that the website be resilient to DDoS attacks, as these attacks can take down the website, which could lead to a number of undesirable outcomes:
+
+\begin{itemize}
+\item Lost revenue: due to the lack of direct sales being made because of the downtime. This can be as much as \$50,000 per hour during peak usage. In addition, lack of support because of the downtime can also affect future sales, as existing customers who are unable to get support will be frustrated and might see alternatives.
+\item Lost customer: trust/reputation, as customers will see that we are unable to prevent DDoS attacks to the website, and by connection, might not be able to protect any data that we keep as part of their relationship with us.
+  \item Lost productivity: as the website can be used to store internal data that is used by the company for productivity reasons, such as documentation, which, if inaccessible, will harm the productivity of the company.
+\end{itemize}
+
+As such, it is important that the website can be recovered from a DDoS attack within 12 hours from the start of the attack.
+
+\subsection{Solutions}
+In the event of a DDoS attack, we need to define what must be implemented to allow the business functions to continue. These are listed below.
+
+\begin{table}[H]
+  \centering
+  \begin{tabulary}{\textwidth}{l|LL}
+    \textbf{Asset} & \textbf{Data} & \textbf{Network} \\
+    \hline
+    Short Term &
+    The data must be made available at all times, to allow both customers and employees to access in order to perform the business functions. &
+    The network must remain online to allow the data to be made available for access. \\
+    \hline
+    Long Term &
+    In addition to the short term objective of ensuring the data is available, the data must be verified that it has remained confidential, and that its integrity is intact, to ensure that there are no harmful effects after any disaster scenario. &
+    In addition to the short term objective of keeping the network online, the network must also be shored up to prevent further DDoS attacks from compromising the system.
+  \end{tabulary}
+\end{table}
+
+Based on the continuity objectives defined above, we are able to come up with the following solutions to a DDoS attack sceneario. These are split into the three security control aspects: preventitive, corrective, and detective.
+
+\paragraph{Preventitive}
+\begin{itemize}
+\item Install firewalls before the web servers with deep packet inspection to throw away invalid packets.
+\item Enable rate limiting to limit the number of requests each IP address can make, to limit the amount of traffic generated.
+\item Have multiple geographically unique locations for hosting the website, to ensure that there is no single point of failure.
+\item Ensure adequate resources to allow both the network, and the data storage systems to handle larger than expected loads.
+\end{itemize}
+
+\paragraph{Corrective}
+\begin{itemize}
+\item Deploy additional network \& data resources to handle the extra load.
+  \item Monitor sources of the DDoS attack and block them to reduce the load on the system.
+\end{itemize}
+
+\paragraph{Detective}
+\begin{itemize}
+\item Simulate a DDoS attack on the system to perform an audit to establish the vunerability of the current system to DDoS attacks, which can be addressed by the developers at a later time.
+\item Ensure the system generates valid logs that can be used to idenfity any failure points during a real DDoS attack.
+\end{itemize}
+
+\subsection{Disaster Recovery Plan}
+After the DDoS attack has been mitigated, the website will need to be brought back up within the recovery time stated in the Business Impact Analysis. Therefore, the following steps will need to be taken in event of a DDoS attack.
+
+\begin{itemize}
+  \item Idenfity whether the system is under a DDoS attack, or whether there is larger than expected load for various reasons.
+  \item If there is a DDoS attack, set up a designated contact person who is responsible for handling the recovery plan, and begin implementing the recovery plan.
+  \item Idenfity the source(s) of the DDoS attack, and blacklist them to reduce the load on the system.
+  \item Deploy additional resources to prevent the DDoS attack from overwhelming existing resources, for example, have a secondary hot data center that can be activated in the event of a DDoS attack to share the load, while another cold data center can be enabled to further mitigate the load off the primary and now running secondary systems.
+  \item Contact law enforcement, providing as much detail as possible about the attack, and cooperate with any requests that they make, within reason.
+    \item Begin verifiying existing data backups to ensure they are valid and can be recovered.
+\end{itemize}
+
+\subsection{Ongoing Plan Implementation and Maintenance}
+In order to ensure that the recovery plan is useful, it needs to be constantly verified and updated to ensure that it continues to work. This requires simulations of a DDoS recovery sceneario to be undertaken once quarterly, to ensure that the recovery plan is accurate and can be used to recover from a DDoS attack, but also to ensure that the employees in charge of implementing the plan have an accurate understanding of what is to be done and when. In addition, a simulated DDoS attack sceneario should be performed once yearly, to ensure that the system is capable of adapting to the changes introducted in the plan, while also identifying any weaknesses in the system that can be addressed to improve the resiliency of the system.
 
 \end{document}
